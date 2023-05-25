@@ -1,8 +1,7 @@
-using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class Cube : MonoBehaviour
+public class RoundedCube : MonoBehaviour
 {
     [SerializeField] public int _xSize, _ySize, _zSize;
 
@@ -37,21 +36,85 @@ public class Cube : MonoBehaviour
         }
 
         t = CreateTopFace(triangles, t, ring);
+        t = CreateBottomFace(triangles, t, ring);
         _mesh.triangles = triangles;
+    }
+
+    private int CreateBottomFace(int[] triangles, int t, int ring)
+    {
+        int v = 1;
+        int vMid = _vertices.Length - (_xSize - 1) * (_zSize - 1);
+        t = SetQuad(triangles, t, ring - 1, vMid, 0, 1);
+        for (int x = 1; x < _xSize - 1; x++, v++, vMid++)
+        {
+            t = SetQuad(triangles, t, vMid, vMid + 1, v, v + 1);
+        }
+
+        t = SetQuad(triangles, t, vMid, v + 2, v, v + 1);
+
+        int vMin = ring - 2;
+        vMid -= _xSize - 2;
+        int vMax = v + 2;
+
+        for (int z = 1; z < _zSize - 1; z++, vMin--, vMid++, vMax++)
+        {
+            t = SetQuad(triangles, t, vMin, vMid + _xSize - 1, vMin + 1, vMid);
+            for (int x = 1; x < _xSize - 1; x++, vMid++)
+            {
+                t = SetQuad(triangles, t, vMid + _xSize - 1, vMid + _xSize, vMid, vMid + 1);
+            }
+
+            t = SetQuad(triangles, t, vMid + _xSize - 1, vMax + 1, vMid, vMax);
+        }
+
+        int vTop = vMin - 1;
+        t = SetQuad(triangles, t, vTop + 1, vTop, vTop + 2, vMid);
+
+        for (int x = 1; x < _xSize - 1; x++, vTop--, vMid++)
+        {
+            t = SetQuad(triangles, t, vTop, vTop - 1, vMid, vMid + 1);
+        }
+
+        t = SetQuad(triangles, t, vTop, vTop - 1, vMid, vTop - 2);
+        return t;
     }
 
     private int CreateTopFace(int[] triangles, int t, int ring)
     {
-        int tTemp = t;
-        int v = _ySize * ring;
-        for (int q = 0; q < _xSize - 1; q++, v++)
+        int v = ring * _ySize;
+        for (int x = 0; x < _xSize - 1; x++, v++)
         {
-            tTemp = SetQuad(triangles, tTemp, v, v + 1, v + ring - 1, v + ring);
+            t = SetQuad(triangles, t, v, v + 1, v + ring - 1, v + ring);
         }
 
-        tTemp = SetQuad(triangles, tTemp, v, v + 1, v + ring - 1, v + 2);
+        t = SetQuad(triangles, t, v, v + 1, v + ring - 1, v + 2);
 
-        return tTemp;
+
+        int vMin = ring * (_ySize + 1) - 1;
+        int vMid = vMin + 1;
+        int vMax = v + 2;
+        for (int z = 1; z < _zSize - 1; vMin--, vMid++, vMax++, z++)
+        {
+            t = SetQuad(triangles, t, vMin, vMid, vMin - 1, vMid + _xSize - 1);
+
+            for (int x = 1; x < _xSize - 1; x++, vMid++)
+            {
+                t = SetQuad(triangles, t, vMid, vMid + 1, vMid + _xSize - 1, vMid + _xSize);
+            }
+
+            t = SetQuad(triangles, t, vMid, vMax, vMid + _xSize - 1, vMax + 1);
+        }
+
+        int vTop = vMin - 2;
+        t = SetQuad(triangles, t, vMin, vMid, vTop + 1, vTop);
+        for (int x = 1; x < _xSize - 1; x++, vTop--, vMid++)
+        {
+            t = SetQuad(triangles, t, vMid, vMid + 1, vTop, vTop - 1);
+        }
+
+        t = SetQuad(triangles, t, vMid, vTop - 2, vTop, vTop - 1);
+
+        return t;
     }
 
     private static int SetQuad(int[] triangles, int i, int v00, int v10, int v01, int v11)
@@ -106,7 +169,7 @@ public class Cube : MonoBehaviour
         {
             for (int x = 1; x < _xSize; x++)
             {
-                _vertices[v++] = new Vector3(x, 0, z);
+                _vertices[v++] = new Vector3(x, _ySize, z);
             }
         }
 
@@ -114,7 +177,7 @@ public class Cube : MonoBehaviour
         {
             for (int x = 1; x < _xSize; x++)
             {
-                _vertices[v++] = new Vector3(x, _ySize, z);
+                _vertices[v++] = new Vector3(x, 0, z);
             }
         }
 
