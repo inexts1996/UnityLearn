@@ -3,9 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class RoundedCube : MonoBehaviour
 {
-    [SerializeField] public int _xSize, _ySize, _zSize;
+    [SerializeField] private int _xSize, _ySize, _zSize;
+    [SerializeField] private int roundness; 
 
     private Vector3[] _vertices;
+    private Vector3[] _normals;
 
     private void Awake()
     {
@@ -139,6 +141,7 @@ public class RoundedCube : MonoBehaviour
         int faceVertices = ((_xSize - 1) * (_ySize - 1) + (_xSize - 1) * (_zSize - 1) + (_ySize - 1) * (_zSize - 1)) * 2;
 
         _vertices = new Vector3[cornerVertices + edgeVertices + faceVertices];
+        _normals = new Vector3[_vertices.Length];
 
         int v = 0;
 
@@ -181,6 +184,7 @@ public class RoundedCube : MonoBehaviour
             }
         }
 
+        _mesh.normals = _normals;
         _mesh.vertices = _vertices;
     }
 
@@ -191,10 +195,12 @@ public class RoundedCube : MonoBehaviour
             return;
         }
 
-        Gizmos.color = Color.black;
         for (int i = 0; i < _vertices.Length; i++)
         {
+            Gizmos.color = Color.black;
             Gizmos.DrawSphere(_vertices[i], 0.1f);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawRay(_vertices[i], _normals[i]);
         }
     }
 }
