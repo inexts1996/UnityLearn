@@ -4,7 +4,7 @@ using UnityEngine;
 public class RoundedCube : MonoBehaviour
 {
     [SerializeField] private int _xSize, _ySize, _zSize;
-    [SerializeField] private int roundness; 
+    [SerializeField] private int _roundness; 
 
     private Vector3[] _vertices;
     private Vector3[] _normals;
@@ -149,22 +149,22 @@ public class RoundedCube : MonoBehaviour
         {
             for (int x = 0; x <= _xSize; x++)
             {
-                _vertices[v++] = new Vector3(x, y, 0);
+                SetVertex(v++, x, y, 0);
             }
 
             for (int z = 1; z <= _zSize; z++)
             {
-                _vertices[v++] = new Vector3(_xSize, y, z);
+                SetVertex(v++, _xSize, y, z);
             }
 
             for (int x = _xSize - 1; x > -1; x--)
             {
-                _vertices[v++] = new Vector3(x, y, _zSize);
+                SetVertex(v++, x, y, _zSize);
             }
 
             for (int z = _zSize - 1; z > 0; z--)
             {
-                _vertices[v++] = new Vector3(0, y, z);
+                SetVertex(v++, 0, y, z);
             }
         }
 
@@ -172,7 +172,8 @@ public class RoundedCube : MonoBehaviour
         {
             for (int x = 1; x < _xSize; x++)
             {
-                _vertices[v++] = new Vector3(x, _ySize, z);
+                SetVertex(v++, x, _ySize, z);
+
             }
         }
 
@@ -180,12 +181,28 @@ public class RoundedCube : MonoBehaviour
         {
             for (int x = 1; x < _xSize; x++)
             {
-                _vertices[v++] = new Vector3(x, 0, z);
+                SetVertex(v++, x, 0, z);
             }
         }
 
         _mesh.normals = _normals;
         _mesh.vertices = _vertices;
+    }
+
+    private void SetVertex(int i, int x, int y, int z)
+    {
+        Vector3 inner = _vertices[i] = new Vector3(x, y, z);
+        if (x < _roundness)
+        {
+            inner.x = _roundness;
+        }
+        else if (x > _xSize - _roundness)
+        {
+            inner.x = _xSize - _roundness;
+        }
+        _normals[i] = (_vertices[i] - inner).normalized;
+        _vertices[i] = inner + _normals[i] * _roundness;
+        
     }
 
     private void OnDrawGizmos()
