@@ -200,6 +200,24 @@ public class RoundedCube : MonoBehaviour
         {
             inner.x = _xSize - _roundness;
         }
+
+        if (y < _roundness)
+        {
+            inner.y = _roundness;
+        }
+        else if (y > _ySize - _roundness)
+        {
+            inner.y = _ySize - _roundness;
+        }
+
+        if (z < _roundness)
+        {
+            inner.z = _roundness;
+        }
+        else if (z > _zSize - _roundness)
+        {
+            inner.z = _zSize - _roundness;
+        }
         _normals[i] = (_vertices[i] - inner).normalized;
         _vertices[i] = inner + _normals[i] * _roundness;
         
