@@ -59,7 +59,7 @@ public class Grid : MonoBehaviour
             for (int x = 0; x <= _xSize; x++, i++)
             {
                 _vertices[i] = new Vector3(x, y);
-                uv[i] = new Vector2(x * 1f/_xSize, y * 1f/_ySize);
+                uv[i] = new Vector2(x * 1f / _xSize, y * 1f / _ySize);
                 tangents[i] = tangent;
             }
         }

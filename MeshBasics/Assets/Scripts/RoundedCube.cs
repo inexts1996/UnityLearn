@@ -4,7 +4,7 @@ using UnityEngine;
 public class RoundedCube : MonoBehaviour
 {
     [SerializeField] private int _xSize, _ySize, _zSize;
-    [SerializeField] private int _roundness; 
+    [SerializeField] private int _roundness;
 
     private Vector3[] _vertices;
     private Vector3[] _normals;
@@ -23,23 +23,45 @@ public class RoundedCube : MonoBehaviour
 
     private void GenerateTriangles()
     {
+        int[] trianglesZ = new int[(_xSize * _ySize) * 12];
+        int[] trianglesX = new int[(_ySize * _zSize) * 12];
+        int[] trianglesY = new int[(_xSize * _zSize) * 12];
+
         int quads = (_xSize * _ySize + _xSize * _zSize + _ySize * _zSize) * 2;
-        var triangles = new int[quads * 6];
+        int tz = 0, tx = 0, ty = 0, v = 0;
         int ring = (_xSize + _zSize) * 2;
-        int t = 0, v = 0;
         for (int y = 0; y < _ySize; y++, v++)
         {
-            for (int q = 0; q < ring - 1; q++, v++)
+            for (int q = 0; q < _xSize; q++, v++)
             {
-                t = SetQuad(triangles, t, v, v + 1, v + ring, v + ring + 1);
+                tz = SetQuad(trianglesZ, tz, v, v + 1, v + ring, v + ring + 1);
             }
 
-            t = SetQuad(triangles, t, v, v - ring + 1, v + ring, v + 1);
+            for (int q = 0; q < _zSize; q++, v++)
+            {
+                tx = SetQuad(trianglesX, tx, v, v + 1, v + ring, v + ring + 1);
+            }
+
+            for (int q = 0; q < _xSize; q++, v++)
+            {
+                tz = SetQuad(trianglesZ, tz, v, v + 1, v + ring, v + ring + 1);
+            }
+
+            for (int q = 0; q < _zSize - 1; q++, v++)
+            {
+                tx = SetQuad(trianglesX, tx, v, v + 1, v + ring, v + ring + 1);
+            }
+
+
+            tx = SetQuad(trianglesX, tx, v, v - ring + 1, v + ring, v + 1);
         }
 
-        t = CreateTopFace(triangles, t, ring);
-        t = CreateBottomFace(triangles, t, ring);
-        _mesh.triangles = triangles;
+        ty = CreateTopFace(trianglesY, ty, ring);
+        ty = CreateBottomFace(trianglesY, ty, ring);
+        _mesh.subMeshCount = 3;
+        _mesh.SetTriangles(trianglesZ, 0);
+        _mesh.SetTriangles(trianglesX, 1);
+        _mesh.SetTriangles(trianglesY, 2);
     }
 
     private int CreateBottomFace(int[] triangles, int t, int ring)
@@ -173,7 +195,6 @@ public class RoundedCube : MonoBehaviour
             for (int x = 1; x < _xSize; x++)
             {
                 SetVertex(v++, x, _ySize, z);
-
             }
         }
 
@@ -185,8 +206,8 @@ public class RoundedCube : MonoBehaviour
             }
         }
 
-        _mesh.normals = _normals;
         _mesh.vertices = _vertices;
+        _mesh.normals = _normals;
     }
 
     private void SetVertex(int i, int x, int y, int z)
@@ -218,9 +239,9 @@ public class RoundedCube : MonoBehaviour
         {
             inner.z = _zSize - _roundness;
         }
+
         _normals[i] = (_vertices[i] - inner).normalized;
         _vertices[i] = inner + _normals[i] * _roundness;
-        
     }
 
     private void OnDrawGizmos()
