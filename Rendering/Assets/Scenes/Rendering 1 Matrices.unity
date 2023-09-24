@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 330670121}
   - component: {fileID: 330670122}
   - component: {fileID: 330670120}
+  - component: {fileID: 330670123}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -210,6 +211,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotation: {x: 0, y: 0, z: 0}
+--- !u!114 &330670123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330670117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4041c975d8f4bd946b0abac8a3a99945, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  focalLength: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
